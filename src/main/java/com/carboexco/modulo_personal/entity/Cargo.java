@@ -1,5 +1,6 @@
 package com.carboexco.modulo_personal.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,14 +10,22 @@ import lombok.Setter;
 @Entity
 @Table(name = "cargo")
 public class Cargo {
-
-
-    @Column(name = "nombre", nullable = false, length = 50)
-    private String nombre;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id_cargo", nullable = false)
     private Integer id;
+
+    @Column(name = "nombre", nullable = false, length = 20)
+    private String nombre;
+
+    @Column(name = "tipo_cargo", nullable = false, length = 20)
+    private String tipoCargo;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "departamento", nullable = false)
+    private Departamento departamento;
+
+    @Column(name = "area", nullable = false)
+    private Integer area;
 
 }

@@ -1,5 +1,7 @@
 package com.carboexco.modulo_personal.controller;
+import com.carboexco.modulo_personal.entity.InfoLaboral;
 import com.carboexco.modulo_personal.entity.Persona;
+import com.carboexco.modulo_personal.repository.InfoLaboralRepository;
 import com.carboexco.modulo_personal.repository.PersonaRepository;
 import org.apache.tomcat.jni.Buffer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import java.util.Optional;
 public class PersonaController {
 
     @Autowired
+    InfoLaboralRepository laboralRepository;
+
+    @Autowired
     PersonaRepository personaRepository;
 
     @GetMapping
@@ -24,18 +29,17 @@ public class PersonaController {
 
     @GetMapping("/{id}")
     public String getPersonabyId(@PathVariable String id) {
-        int []ids=  convertirStringAEnteros(id);
+        String []ids=  id.split(",");
         StringBuffer nombres=new StringBuffer("");
         for(int i =0;i<ids.length; i++) {
+            ids[i] = ids[i].replace(" ", "");
             Optional<Persona> persona = personaRepository.findById(ids[i]);
-
             if (persona.isPresent()){
-                nombres.append(persona.get().getNombres() +" "+persona.get().getApellidos());
+                nombres.append(persona.get().getPrimerNombre()+" "+persona.get().getApellidoPaterno());
                 if (i<ids.length-1){
                     nombres.append(", ");
                 }
             }
-
         }
         return nombres.toString();
     }
@@ -67,7 +71,11 @@ public class PersonaController {
     @GetMapping("/cargo/{id}")
     public List<Persona> getPersonabyCargo(@PathVariable int id) {
 
-        List<Persona> personasCargo = personaRepository.findByIdCargo_Id(id);
+        List<Persona> personasCargo=new ArrayList<>();
+        List<InfoLaboral> infoLaborals = (List<InfoLaboral>) laboralRepository.findFirstById_IdCargoOrderById_IdPersonaAsc(id);
+        for (InfoLaboral i: infoLaborals){
+            personasCargo.add(i.getId().getIdPersona());
+        }
         return personasCargo;
     }
 
@@ -78,18 +86,20 @@ public class PersonaController {
     }
 
     @PutMapping("/{id}")
-    public Persona putPersonabyId(@PathVariable int id, @RequestBody Persona persona) {
+    public Persona putPersonabyId(@PathVariable String id, @RequestBody Persona persona) {
 
         Optional<Persona> personaCurrent = personaRepository.findById(id);
 
         if (personaCurrent.isPresent()) {
             Persona personaReturn = personaCurrent.get();
 
-            personaReturn.setNombres(persona.getNombres());
-            personaReturn.setApellidos(persona.getApellidos());
+            personaReturn.setPrimerNombre(persona.getPrimerNombre());
+            personaReturn.setSegundoNombre(persona.getSegundoNombre());
+            personaReturn.setApellidoPaterno(persona.getApellidoPaterno());
+            personaReturn.setApellidoMaterno(persona.getApellidoMaterno());
             personaReturn.setCedula(persona.getCedula());
-            personaReturn.setIdCargo(persona.getIdCargo());
-
+            personaReturn.setTelefono(persona.getTelefono());
+            personaReturn.setIdFoto(personaReturn.getIdFoto());
 
             return personaReturn;
 

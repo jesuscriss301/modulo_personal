@@ -1,6 +1,9 @@
 package com.carboexco.modulo_personal.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,22 +12,31 @@ import lombok.Setter;
 @Entity
 @Table(name = "persona")
 public class Persona {
+
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @Column(name = "id_persona", nullable = false, length = 11)
+    private String idPersona;
 
-    @Column(name = "cedula", nullable = false)
-    private Long cedula;
+    @Column(name = "primer_nombre", nullable = false, length = 20)
+    private String primerNombre;
 
-    @Column(name = "nombres", nullable = false, length = 100)
-    private String nombres;
+    @Column(name = "segundo_nombre", length = 20)
+    private String segundoNombre;
 
-    @Column(name = "apellidos", nullable = false, length = 100)
-    private String apellidos;
+    @Column(name = "apellido_paterno", nullable = false, length = 20)
+    private String apellidoPaterno;
 
-    @ManyToOne
-    @JoinColumn(name = "id_cargo")
-    private Cargo idCargo;
+    @Column(name = "apellido_materno", nullable = false, length = 20)
+    private String apellidoMaterno;
+
+    @Column(name = "cedula", length = 15)
+    private String cedula;
+
+    @Column(name = "telefono", length = 10)
+    private String telefono;
+
+    @Column(name = "id_foto")
+    private Integer idFoto;
 
 }
