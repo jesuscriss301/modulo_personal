@@ -12,8 +12,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "persona")
 public class Persona {
-
-
     @Id
     @Column(name = "id_persona", nullable = false, length = 11)
     private String idPersona;

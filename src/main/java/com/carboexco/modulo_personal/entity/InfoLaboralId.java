@@ -1,6 +1,5 @@
 package com.carboexco.modulo_personal.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -16,8 +15,7 @@ import java.util.Objects;
 public class InfoLaboralId implements Serializable {
     private static final long serialVersionUID = -4885165163224914903L;
     @Column(name = "id_persona", nullable = false, length = 7)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Persona idPersona;
+    private String idPersona;
 
     @Column(name = "id_cargo", nullable = false)
     private Integer idCargo;

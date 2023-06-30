@@ -1,74 +1,95 @@
 package com.carboexco.modulo_personal.controller;
 
-
 import com.carboexco.modulo_personal.entity.Cargo;
 import com.carboexco.modulo_personal.repository.CargoRepository;
+import com.carboexco.modulo_personal.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/cargos")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CargoController {
 
+    private final CargoRepository cargoRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private CargoRepository cargoRepository;
+    public CargoController(CargoRepository cargoRepository) {
+        this.cargoRepository = cargoRepository;
+    }
 
-    // Obtener todos los cargos
     @GetMapping
-    public List<Cargo> getAllCargos() {
-        return cargoRepository.findAll();
+    public ResponseEntity<List<Cargo>> getAllCargos(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<Cargo> cargos = cargoRepository.findAll();
+            return ResponseEntity.ok(cargos);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Obtener un cargo por su ID
     @GetMapping("/{id}")
-    public Cargo getCargoById(@PathVariable int id) {
-        Optional<Cargo> cargo = cargoRepository.findById(id);
-
-        if (cargo.isPresent()) {
-            return cargo.get();
+    public ResponseEntity<Cargo> getCargoById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Cargo> cargo = cargoRepository.findById(id);
+            if (cargo.isPresent()) {
+                return ResponseEntity.ok(cargo.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Crear un nuevo cargo
     @PostMapping
-    public Cargo createCargo(@RequestBody Cargo cargo) {
-        return cargoRepository.save(cargo);
+    public ResponseEntity<Cargo> createCargo(@RequestHeader("Authorization") String bearerToken, @RequestBody Cargo cargo) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Cargo createdCargo = cargoRepository.save(cargo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCargo);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Actualizar un cargo existente por su ID
     @PutMapping("/{id}")
-    public Cargo updateCargo(@PathVariable int id, @RequestBody Cargo cargo) {
-        Optional<Cargo> currentCargo = cargoRepository.findById(id);
-
-        if (currentCargo.isPresent()) {
-            Cargo updatedCargo = currentCargo.get();
-            updatedCargo.setNombre(cargo.getNombre());
-            updatedCargo.setTipoCargo(cargo.getTipoCargo());
-            updatedCargo.setDepartamento(cargo.getDepartamento());
-            updatedCargo.setArea(cargo.getArea());
-            return cargoRepository.save(updatedCargo);
+    public ResponseEntity<Cargo> updateCargo(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody Cargo cargo) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Cargo> currentCargo = cargoRepository.findById(id);
+            if (currentCargo.isPresent()) {
+                Cargo updatedCargo = currentCargo.get();
+                updatedCargo.setNombre(cargo.getNombre());
+                updatedCargo.setTipoCargo(cargo.getTipoCargo());
+                updatedCargo.setDepartamento(cargo.getDepartamento());
+                updatedCargo.setArea(cargo.getArea());
+                Cargo savedCargo = cargoRepository.save(updatedCargo);
+                return ResponseEntity.ok(savedCargo);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Eliminar un cargo por su ID
     @DeleteMapping("/{id}")
-    public Cargo deleteCargo(@PathVariable int id) {
-        Optional<Cargo> cargo = cargoRepository.findById(id);
-
-        if (cargo.isPresent()) {
-            Cargo deletedCargo = cargo.get();
-            cargoRepository.deleteById(id);
-            return deletedCargo;
+    public ResponseEntity<Cargo> deleteCargo(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Cargo> cargo = cargoRepository.findById(id);
+            if (cargo.isPresent()) {
+                cargoRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
