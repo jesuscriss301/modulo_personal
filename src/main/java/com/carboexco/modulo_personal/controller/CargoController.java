@@ -33,6 +33,15 @@ public class CargoController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    @GetMapping("/departamento/{id}")
+    public ResponseEntity<List<Cargo>> getAllCargosByDepartamento(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<Cargo> cargos = cargoRepository.findByDepartamento_IdOrderByNombreAsc(id);
+            return ResponseEntity.ok(cargos);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Cargo> getCargoById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {

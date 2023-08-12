@@ -20,7 +20,7 @@ public class Cargo {
     @Column(name = "tipo_cargo", nullable = false, length = 20)
     private String tipoCargo;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "departamento", nullable = false)
     private Departamento departamento;
 
